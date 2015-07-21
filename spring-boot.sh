@@ -11,15 +11,20 @@
 
 
 # the name of the project, will also be used for the war file, log file, ...
-PROJECT_NAME=springboot
+PROJECT_NAME=zte
+
 # the user which should run the service
 SERVICE_USER=root
+
 # base directory for the spring boot jar
 SPRINGBOOTAPP_HOME=/usr/local/$PROJECT_NAME
 export SPRINGBOOTAPP_HOME
 
 # the spring boot war-file
 SPRINGBOOTAPP_WAR="$SPRINGBOOTAPP_HOME/$PROJECT_NAME.war"
+
+# the spring boot config profile
+SPRINGBOOTAPP_PROFILE=prod
 
 # java executable for spring boot app, change if you have multiple jdks installed
 SPRINGBOOTAPP_JAVA=$JAVA_HOME/bin/java
@@ -41,7 +46,7 @@ start() {
     echo -n $"Starting $PROJECT_NAME: "
 
     cd "$SPRINGBOOTAPP_HOME"
-    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_WAR\"  >> \"$LOG\" 2>&1 &"
+    su $SERVICE_USER -c "nohup $SPRINGBOOTAPP_JAVA -jar \"$SPRINGBOOTAPP_WAR\" --spring.profiles.active=$SPRINGBOOTAPP_PROFILE >> \"$LOG\" 2>&1 &"
 
     while { pid_of_spring_boot > /dev/null ; } &&
         ! { tail --lines=+$cnt "$LOG" | grep -q ' Started \S+ in' ; } ; do
